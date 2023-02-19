@@ -6,6 +6,8 @@ import { NewNote } from "./NewNote"
 import { useLocalStorage } from "./useLocalStorage"
 import { v4 as uuidV4 } from "uuid"
 import { NoteList } from "./note-list"
+import { NoteLayout } from "./NoteLayout"
+import { Note } from "./Note"
 
 export type Note = {
   id: string;
@@ -38,7 +40,7 @@ function App() {
   const [notes, setNotes] = useLocalStorage<RawNote[]>("NOTES", [])
   const [tags, setTags] = useLocalStorage<Tag[]>("TAGS", [])
 
-  // 把tag根据id放进note里
+  // 把tag根据id放进note里，note和tag都是obj
   const notesWithTags = useMemo(()=>{
     return notes.map(note =>{
       return { ...note, tags: tags.filter(tag => note.tagIds.includes(tag.id)) }
@@ -73,8 +75,8 @@ function App() {
               onSubmit={onCreateNote} 
               onAddTag={addTag}
               availableTags={tags}/>} />
-        <Route path="/:id">
-          <Route index element={<h1>show</h1>}/>
+        <Route path="/:id" element={<NoteLayout notes={notesWithTags}/>}>
+          <Route index element={<Note/>}/>
           <Route path="edit" element={<h1>Edit</h1>}/>
         </Route>
         <Route path="*" element={<Navigate to="/" />} />
