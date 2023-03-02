@@ -1,50 +1,77 @@
 import { Badge, Button, Col, Row, Stack } from "react-bootstrap"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { useNote } from "./NoteLayout"
 import ReactMarkdown from "react-markdown"
+import { useCallback, useContext, useEffect, useState } from "react"
+import { appContext } from "./Context"
+import Quill from "quill"
+import "quill/dist/quill.bubble.css"
 
-type NoteProps = {
-    onDelete: (id: string) => void
-}
+export function Note() {
+  const note = useNote()
+  const navigate = useNavigate()
+  const { onDeleteNote: onDelete, socket } = useContext(appContext)!
+  const [quill, setQuill] = useState<Quill>()
 
-export function Note({onDelete}: NoteProps) {
-    const note = useNote()
-    const navigate = useNavigate()
-    
-    return (<>
-        <Row className="align-items-center mb-4">
-            <Col>
-                <h1>{note.title}</h1>
-                {note.tags.length > 0 && (
-                    <Stack
-                        gap={1}
-                        direction="horizontal"
-                        className="flex-wrap"
-                    >
-                        {note.tags.map(tag => (
-                            <Badge className="text-truncate" key={tag.id}>{tag.label}</Badge>
-                        ))}
-                    </Stack>
-                )}
-            </Col>
-            <Col xs="auto">
-                <Stack gap={2} direction="horizontal">
-                    <Link to={`/${note.id}/edit`}>
-                        <Button variant="primary">Edit</Button>
-                    </Link>
-                    <Button 
-                        variant="outline-danger" 
-                        onClick={() => {
-                            onDelete(note.id)
-                            navigate("/")
-                        }}
-                    >Delete</Button>
-                    <Link to="/">
-                        <Button variant="outline-secondary">Back</Button>
-                    </Link>
-                </Stack>
-            </Col>
-        </Row>
-        <ReactMarkdown>{note.markdown}</ReactMarkdown>
-    </>)
+  const markdownRef = useCallback((wrapper: HTMLDivElement) => {
+    if (wrapper == null) return
+
+    wrapper.innerHTML = ""
+    const editor = document.createElement("div")
+    wrapper.append(editor)
+    const q = new Quill(editor, { theme: "bubble" })
+
+    q.disable()
+    q.setText("Loading")
+    setQuill(q)
+  }, [])
+
+  const { id } = useParams()
+  useEffect(() => {
+    if (quill == null || socket == null) return
+
+    socket.emit("get-note", id)
+    socket.on("load-note", (note) => {
+      quill.setContents(JSON.parse(note))
+    })
+  }, [quill, socket, id])
+
+  return (
+    <>
+      <Row className="align-items-center mb-4">
+        <Col>
+          <h1>{note?.title}</h1>
+          {note?.tags.length > 0 && (
+            <Stack gap={1} direction="horizontal" className="flex-wrap">
+              {note.tags.map((tag) => (
+                <Badge className="text-truncate" key={tag._id}>
+                  {tag.label}
+                </Badge>
+              ))}
+            </Stack>
+          )}
+        </Col>
+        <Col xs="auto">
+          <Stack gap={2} direction="horizontal">
+            <Link to={`/${note?._id}/edit`}>
+              <Button variant="primary">Edit</Button>
+            </Link>
+            <Button
+              variant="outline-danger"
+              onClick={() => {
+                onDelete(note._id)
+                navigate("/", { replace: true })
+              }}
+            >
+              Delete
+            </Button>
+            <Link to="/" replace={true}>
+              <Button variant="outline-secondary">Back</Button>
+            </Link>
+          </Stack>
+        </Col>
+      </Row>
+      <div className="container" ref={markdownRef}></div>
+    </>
+  )
 }

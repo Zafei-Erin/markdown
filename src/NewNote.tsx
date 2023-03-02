@@ -1,17 +1,16 @@
-import { NoteData, Tag } from "./App";
-import { NoteForm } from "./NoteForm";
+import { NoteData, Tag } from "./Type"
+import { NoteForm } from "./NoteForm"
+import { useContext } from "react"
+import { appContext } from "./Context"
 
-type NewNoteProps = {
-    onSubmit: (data: NoteData) => void,
-    onAddTag: (tag: Tag) => void,
-    availableTags: Tag[]
-}
+export function NewNote() {
+  const context = useContext(appContext)
+  const onSubmit = context!.onCreateNote
 
-export function NewNote({ onSubmit, onAddTag, availableTags }: NewNoteProps) {
-    return (
+  return (
     <>
-        <h1 className="mb-4">New note</h1>
-        <NoteForm onSubmit={onSubmit} onAddTag={onAddTag} availableTags={availableTags}/>
+      <h1 className="mb-4">New note</h1>
+      <NoteForm onSubmit={onSubmit} />
     </>
-    )
+  )
 }
