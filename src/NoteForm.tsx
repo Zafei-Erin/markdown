@@ -47,7 +47,8 @@ export function NoteForm({
   } = useContext(appContext)!
 
   const [quill, setQuill] = useState<Quill>()
-
+  const [selectedTags, setSelectedTags] = useState<Tag[]>(tags)
+  const navigate = useNavigate()
   const titleRef = useRef<HTMLInputElement>(null)
 
   const markdownRef = useCallback((wrapper: HTMLDivElement) => {
@@ -86,9 +87,11 @@ export function NoteForm({
       if (source !== "user") return
       socket.emit("send-changes", delta)
     }
+    // @ts-ignore
     quill.on("text-change", handler)
 
     return () => {
+      // @ts-ignore
       quill.off("text-change", handler)
     }
   }, [quill, socket])
@@ -98,6 +101,7 @@ export function NoteForm({
     if (quill == null || socket == null) return
 
     const handler = (delta: Delta) => {
+      // @ts-ignore
       quill.updateContents(delta)
     }
 
@@ -108,9 +112,6 @@ export function NoteForm({
     }
   }, [quill, socket])
 
-  const [selectedTags, setSelectedTags] = useState<Tag[]>(tags)
-  const navigate = useNavigate()
-
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
 
@@ -120,7 +121,7 @@ export function NoteForm({
       tags: selectedTags,
     })
 
-    navigate("..")
+    navigate("..", { replace: true })
   }
 
   return (
@@ -172,7 +173,7 @@ export function NoteForm({
           <Button type="submit" variant="primary">
             Save
           </Button>
-          <Link to="..">
+          <Link to=".." replace>
             <Button type="button" variant="ontline-secondary">
               Cancel
             </Button>

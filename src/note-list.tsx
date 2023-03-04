@@ -1,54 +1,47 @@
-import { useContext, useEffect, useMemo, useState } from "react"
-import {
-  Form,
-  Stack,
-  Row,
-  Col,
-  Button,
-  Card,
-  Badge,
-  Modal,
-} from "react-bootstrap"
+import { useContext, useMemo, useState } from "react"
+import { Form, Stack, Row, Col, Button } from "react-bootstrap"
 import { Link } from "react-router-dom"
 import ReactSelect from "react-select"
-import browserHistory from 'react-router'
 import { RawNote, Tag } from "./Type"
-import styles from "./NotesList.module.css"
 import { appContext } from "./Context"
-
-type SimplifiedNote = {
-  tags: Tag[]
-  title: string
-  _id: string
-}
-
-type EditTagModalProps = {
-  show: boolean
-  handleClose: () => void
-}
+import { EditTagsModal } from "./EditTagsModal"
+import { NoteCard } from "./NoteCard"
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
+import styled from "styled-components"
 
 export function NoteList() {
-  const { notes, tags } = useContext(appContext)!
+  const { notes, tags, column, onSaveColumn } = useContext(appContext)!
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([])
+  const [title, setTitle] = useState("")
+  const [editTagModalIsOpen, setEditTagModalIsOpen] = useState(false)
+  const notesOrder = column.noteIds
+
+  console.log("notesOrder: " + column.noteIds)
+  console.log("notes: " + JSON.stringify(notes))
+
+  const orderedNotes = notesOrder?.map((noteId) => {
+    return notes.find((note) => note._id === noteId)
+  }) as RawNote[]
+
+  console.log("orderedNotes: " + JSON.stringify(orderedNotes))
 
   const notesWithTags = useMemo(() => {
-    return notes?.map((note) => {
+    return orderedNotes?.map((note) => {
       return {
         ...note,
-        tags: tags?.filter((tag) => note.tagIds.includes(tag._id)),
+        tags: tags?.filter((tag) => note?.tagIds.includes(tag._id)),
       }
     })
   }, [notes, tags])
 
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([])
-  const [title, setTitle] = useState("")
-  const [editTagModalIsOpen, setEditTagModalIsOpen] = useState(false)
+  console.log("notesWithTags: " + JSON.stringify(notesWithTags))
 
   // 每个select的id都要匹配到
   const filteredNotes = useMemo(() => {
     return notesWithTags?.filter((note) => {
       return (
         (title === "" ||
-          note.title.toLowerCase().includes(title.toLowerCase())) &&
+          note.title!.toLowerCase().includes(title.toLowerCase())) &&
         (selectedTags.length === 0 ||
           selectedTags.every((tag) =>
             note.tags?.some((notetage) => notetage._id === tag._id)
@@ -56,6 +49,30 @@ export function NoteList() {
       )
     })
   }, [title, selectedTags, notesWithTags])
+
+  console.log("filteredNotes: " + JSON.stringify(filteredNotes))
+
+  // 拖曳持久化
+  function onDragEnd(result: any) {
+    document.body.style.color = "inherit"
+    document.body.style.backgroundColor = "inherit"
+
+    const { destination, source, draggableId } = result
+
+    // 拖出了范围
+    if (!destination) return
+
+    // 放回原处
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    )
+      return
+
+    notesOrder.splice(source.index, 1)
+    notesOrder.splice(destination.index, 0, draggableId)
+    onSaveColumn(notesOrder)
+  }
 
   return (
     <>
@@ -112,13 +129,41 @@ export function NoteList() {
           </Col>
         </Row>
       </Form>
-      <Row xs={1} sm={2} lg={3} xl={4} className="g-3">
-        {filteredNotes?.map((note) => (
-          <Col key={note._id}>
-            <NoteCard _id={note._id} title={note.title} tags={note.tags} />
-          </Col>
-        ))}
-      </Row>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="1" direction="horizontal">
+          {(provided) => (
+            <Row
+              xs={1}
+              sm={2}
+              lg={3}
+              xl={4}
+              className="g-3"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {filteredNotes?.map((note, index) => (
+                <Draggable key={note._id} draggableId={note._id} index={index}>
+                  {(provided) => (
+                    <Col
+                      key={note._id}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      ref={provided.innerRef}
+                    >
+                      <NoteCard
+                        _id={note._id}
+                        title={note.title}
+                        tags={note.tags}
+                      />
+                    </Col>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </Row>
+          )}
+        </Droppable>
+      </DragDropContext>
       <EditTagsModal
         show={editTagModalIsOpen}
         handleClose={() => setEditTagModalIsOpen(false)}
@@ -127,76 +172,6 @@ export function NoteList() {
   )
 }
 
-function NoteCard({ _id, title, tags }: SimplifiedNote) {
-  return (
-    <Card
-      as={Link}
-      to={`/${_id}`}
-      className={`h-100 text-reset text-decoration-none ${styles.card}`}
-    >
-      <Card.Body>
-        <Stack
-          gap={2}
-          className="align-items-center justify-content-center h-100"
-        >
-          <span className="fs-5">{title}</span>
-          {tags.length > 0 && (
-            <Stack
-              gap={1}
-              direction="horizontal"
-              className="justify-content-center flex-wrap"
-            >
-              {tags.map((tag) => (
-                <Badge className="text-truncate" key={tag._id}>
-                  {tag.label}
-                </Badge>
-              ))}
-            </Stack>
-          )}
-        </Stack>
-      </Card.Body>
-    </Card>
-  )
-}
-
-function EditTagsModal({ show, handleClose }: EditTagModalProps) {
-  const context = useContext(appContext)
-  const availableTags = context!.tags
-  const onUpdateTag = context!.updateTag
-  const onDeleteTag = context!.deleteTag
-
-  return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>Edit Tages</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Stack gap={2}>
-            {availableTags?.map((tag) => (
-              <Row key={tag._id}>
-                <Col>
-                  <Form.Control
-                    type="text"
-                    value={tag.label}
-                    onChange={(e) =>
-                      onUpdateTag({ ...tag, label: e.target.value })
-                    }
-                  />
-                </Col>
-                <Col xs="auto">
-                  <Button
-                    variant="outline-danger"
-                    onClick={() => onDeleteTag(tag._id)}
-                  >
-                    &times;
-                  </Button>
-                </Col>
-              </Row>
-            ))}
-          </Stack>
-        </Form>
-      </Modal.Body>
-    </Modal>
-  )
-}
+const Container = styled.div`
+  display: flex;
+`
