@@ -153,9 +153,6 @@ export const ContextProvider = ({
       _id: "1",
       noteIds: column.noteIds.filter((id) => id !== _id),
     }
-
-    console.log(JSON.stringify(newColumn))
-
     socket.emit("delete-note", { _id, newColumn })
     load()
   }

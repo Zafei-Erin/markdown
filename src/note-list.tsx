@@ -43,6 +43,8 @@ export function NoteList({ filteredNotes }: NoteListProps) {
     onSaveColumn(notesOrder)
   }
 
+  const isDragDisabled = filteredNotes.length !== column.noteIds.length
+
   return (
     <>
       <DragDropContext onDragEnd={onDragEnd}>
@@ -54,7 +56,12 @@ export function NoteList({ filteredNotes }: NoteListProps) {
               ref={provided.innerRef}
             >
               {filteredNotes?.map((note, index) => (
-                <Draggable key={note._id} draggableId={note._id} index={index}>
+                <Draggable
+                  key={note._id}
+                  draggableId={note._id}
+                  index={index}
+                  isDragDisabled={isDragDisabled}
+                >
                   {(provided) => (
                     <Col
                       key={note._id}
