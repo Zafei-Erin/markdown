@@ -64,7 +64,6 @@ export const ContextProvider = ({
         return
       }
       setColumn(() => column)
-      console.log("context: " + column)
     })
   }
 

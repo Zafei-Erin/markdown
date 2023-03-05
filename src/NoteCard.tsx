@@ -12,10 +12,7 @@ export function NoteCard({ _id, title, tags }: SimplifiedNote) {
       className={`h-100 text-reset text-decoration-none ${styles.card}`}
     >
       <Card.Body>
-        <Stack
-          gap={2}
-          className="align-items-center justify-content-center h-100"
-        >
+        <Stack className="align-items-center justify-content-center h-100">
           <span className="fs-5">{title}</span>
           {tags.length > 0 && (
             <Stack

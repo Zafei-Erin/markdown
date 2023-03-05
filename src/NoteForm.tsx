@@ -167,6 +167,7 @@ export function NoteForm({
             className="container"
             ref={markdownRef}
             defaultValue={markdown}
+            style={{ padding: "0" }}
           ></div>
         </Form.Group>
         <Stack direction="horizontal" gap={2} className="justify-content-end">

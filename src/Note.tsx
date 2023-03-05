@@ -6,6 +6,7 @@ import { useCallback, useContext, useEffect, useState } from "react"
 import { appContext } from "./Context"
 import Quill from "quill"
 import "quill/dist/quill.bubble.css"
+import { Container } from "./NewNote"
 
 export function Note() {
   const note = useNote()
@@ -37,41 +38,39 @@ export function Note() {
   }, [quill, socket, id])
 
   return (
-    <>
+    <Container>
       <Row className="align-items-center mb-4">
-        <Col>
-          <h1>{note?.title}</h1>
-          {note?.tags.length > 0 && (
-            <Stack gap={1} direction="horizontal" className="flex-wrap">
-              {note.tags.map((tag) => (
-                <Badge className="text-truncate" key={tag._id}>
-                  {tag.label}
-                </Badge>
-              ))}
-            </Stack>
-          )}
-        </Col>
-        <Col xs="auto">
-          <Stack gap={2} direction="horizontal">
-            <Link to={`/${note?._id}/edit`}>
-              <Button variant="primary">Edit</Button>
-            </Link>
-            <Button
-              variant="outline-danger"
-              onClick={() => {
-                onDelete(note._id)
-                navigate("/", { replace: true })
-              }}
-            >
-              Delete
-            </Button>
-            <Link to="/" replace={true}>
-              <Button variant="outline-secondary">Back</Button>
-            </Link>
+        <h1>{note?.title}</h1>
+        {note?.tags.length > 0 && (
+          <Stack gap={1} direction="horizontal" className="flex-wrap">
+            {note.tags.map((tag) => (
+              <Badge className="text-truncate" key={tag._id}>
+                {tag.label}
+              </Badge>
+            ))}
           </Stack>
-        </Col>
+        )}
       </Row>
-      <div className="container" ref={markdownRef}></div>
-    </>
+      <div className="containerView" ref={markdownRef}></div>
+      <Col xs="auto" style={{ float: "right" }}>
+        <Stack gap={2} direction="horizontal">
+          <Link to={`/${note?._id}/edit`}>
+            <Button variant="primary">Edit</Button>
+          </Link>
+          <Button
+            variant="outline-danger"
+            onClick={() => {
+              onDelete(note._id)
+              navigate("/", { replace: true })
+            }}
+          >
+            Delete
+          </Button>
+          <Link to="/" replace={true}>
+            <Button variant="outline-secondary">Back</Button>
+          </Link>
+        </Stack>
+      </Col>
+    </Container>
   )
 }
