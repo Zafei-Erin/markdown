@@ -10,19 +10,24 @@ export default function Header({
   return (
     <Row className="align-items-center mb-4">
       <Col>
-        <h1>Notes</h1>
+        <h1 className="text-[#3864A5] underline decoration-2  font-style: italic">
+          Notegether
+        </h1>
       </Col>
       <Col xs="auto">
         <Stack gap={2} direction="horizontal">
           <Link to="/new">
-            <Button variant="primary">Create</Button>
+            <button className="bg-[#3864A5] text-white px-2 py-2 rounded-md">
+              {" "}
+              + Create
+            </button>
           </Link>
-          <Button
-            variant="outline-secondary"
+          <button
+            className="border-2 border-[#3864A5] text-[#3864A5] px-2 py-1.5 rounded-md"
             onClick={() => setEditTagModalIsOpen(true)}
           >
             Edit Tags
-          </Button>
+          </button>
         </Stack>
       </Col>
     </Row>

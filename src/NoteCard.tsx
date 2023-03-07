@@ -6,29 +6,25 @@ import { SimplifiedNote } from "./Type"
 
 export function NoteCard({ _id, title, tags }: SimplifiedNote) {
   return (
-    <Card
-      as={Link}
+    <Link
       to={`/${_id}`}
-      className={`h-100 text-reset text-decoration-none ${styles.card}`}
+      className="text-reset text-decoration-none w-full h-full flex align-items-center"
     >
-      <Card.Body>
-        <Stack className="align-items-center justify-content-center h-100">
-          <span className="fs-5">{title}</span>
-          {tags.length > 0 && (
-            <Stack
-              gap={1}
-              direction="horizontal"
-              className="justify-content-center flex-wrap"
-            >
-              {tags.map((tag) => (
-                <Badge className="text-truncate" key={tag._id}>
-                  {tag.label}
-                </Badge>
-              ))}
-            </Stack>
-          )}
-        </Stack>
-      </Card.Body>
-    </Card>
+      <div className=" w-full pl-3">
+        <span className="font-semibold text-lg">{title}</span>
+        {tags.length > 0 && (
+          <div className="flex">
+            {tags.map((tag) => (
+              <div
+                className="text-truncate mr-3 border-2 rounded-full px-2 border-[#3864A5] text-xs group-hover:border-white"
+                key={tag._id}
+              >
+                {tag.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </Link>
   )
 }

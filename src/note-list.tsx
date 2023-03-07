@@ -68,6 +68,7 @@ export function NoteList({ filteredNotes }: NoteListProps) {
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       ref={provided.innerRef}
+                      className="group hover:bg-[#3864A5] hover:text-white h-[80px] overflow-y-auto"
                     >
                       <Container>
                         <NoteCard

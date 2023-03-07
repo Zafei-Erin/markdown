@@ -42,20 +42,33 @@ export default function Header() {
   }, [title, selectedTags, notesWithTags])
 
   return (
-    <Container>
+    <div className="flex-none max-w-[260px] min-w-[200px] w-[26%] shadow-[10px_0_25px_-24px_rgb(0,0,0,0.3)] mr-10">
       <Form>
         <Row className="mb-4" sm={1}>
           <Form.Group controlId="title">
-            {/* <Form.Label>Title</Form.Label> */}
-            <Form.Control
+            <input
+              className="rounded-[4px] w-[90%] mb-1 border-2 border-gray-300 pl-3  py-2 text-sm text-gray-500"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Input Title"
+              placeholder="🔍 Search"
             />
           </Form.Group>
           <Form.Group controlId="tags">
             <ReactSelect
+              styles={{
+                control: (b, s) => ({
+                  ...b,
+                  width: "90%",
+                  height: "22px",
+                  borderWidth: "2px",
+                  borderColor: "#d1d5db",
+                  fontSize: "14px",
+                  color: "#111827",
+                  paddingLeft: "6px",
+                  overflow: "hidden",
+                }),
+              }}
               value={selectedTags.map((tag) => {
                 return { label: tag.label, value: tag._id }
               })}
@@ -70,16 +83,12 @@ export default function Header() {
                 )
               }}
               isMulti
-              placeholder="Select Tags"
+              placeholder="Tags"
             />
           </Form.Group>
         </Row>
       </Form>
       <NoteList filteredNotes={filteredNotes} />
-    </Container>
+    </div>
   )
 }
-
-const Container = styled.div`
-  height: 100vh;
-`

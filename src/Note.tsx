@@ -1,4 +1,4 @@
-import { Badge, Button, Col, Row, Stack } from "react-bootstrap"
+import { Badge, Button, Col, Container, Row, Stack } from "react-bootstrap"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { useNote } from "./NoteLayout"
 import ReactMarkdown from "react-markdown"
@@ -6,7 +6,6 @@ import { useCallback, useContext, useEffect, useState } from "react"
 import { appContext } from "./Context"
 import Quill from "quill"
 import "quill/dist/quill.bubble.css"
-import { Container } from "./NewNote"
 
 export function Note() {
   const note = useNote()
@@ -38,8 +37,8 @@ export function Note() {
   }, [quill, socket, id])
 
   return (
-    <Container>
-      <Row className="align-items-center mb-4">
+    <Container className="justify-content-center pb-6">
+      <Row className="mb-4">
         <h1>{note?.title}</h1>
         {note?.tags.length > 0 && (
           <Stack gap={1} direction="horizontal" className="flex-wrap">
@@ -71,6 +70,7 @@ export function Note() {
           </Link>
         </Stack>
       </Col>
+      <div></div>
     </Container>
   )
 }

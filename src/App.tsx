@@ -20,9 +20,12 @@ function App() {
 
   return (
     <ContextProvider socket={socket}>
-      <Container className="my-4">
-        <Header setEditTagModalIsOpen={setEditTagModalIsOpen}/>
-        <MainContent>
+      <div className="my-4 mx-[2%] h-screen pb-6">
+        <div className="h-[10%]">
+          <Header setEditTagModalIsOpen={setEditTagModalIsOpen} />
+        </div>
+
+        <div className="flex min-h-screen">
           <SideBar />
           <Routes>
             <Route path="/" element={<IndexPage />} />
@@ -33,21 +36,14 @@ function App() {
             </Route>
             <Route path="*" element={<Navigate to="/" replace={true} />} />
           </Routes>
-        </MainContent>
+        </div>
         <EditTagsModal
           show={editTagModalIsOpen}
           handleClose={() => setEditTagModalIsOpen(false)}
         />
-      </Container>
+      </div>
     </ContextProvider>
   )
 }
 
 export default App
-
-const MainContent = styled.div`
-  display: grid;
-  grid-template-columns: 20% 1fr;
-  align-items: start;
-  column-gap: 30px;
-`
