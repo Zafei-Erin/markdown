@@ -1,10 +1,7 @@
 import React, { useContext, useMemo, useState } from "react"
 import { Button, Col, Form, Row, Stack } from "react-bootstrap"
-import { Link } from "react-router-dom"
 import ReactSelect from "react-select"
-import styled from "styled-components"
 import { appContext } from "./Context"
-import { NewNote } from "./NewNote"
 import { NoteList } from "./note-list"
 import { RawNote, Tag } from "./Type"
 

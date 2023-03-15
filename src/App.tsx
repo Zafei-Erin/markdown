@@ -1,8 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css"
 import { useContext, useState } from "react"
 import { Col, Container, Row } from "react-bootstrap"
-import { Routes, Route, Navigate, Link } from "react-router-dom"
-import { NewNote } from "./NewNote"
+import { Routes, Route, Navigate, Link, redirect } from "react-router-dom"
 import { NoteLayout } from "./NoteLayout"
 import { Note } from "./Note"
 import { EditNote } from "./EditNote"
@@ -13,6 +12,7 @@ import styled from "styled-components"
 import Header from "./Header"
 import IndexPage from "./IndexPage"
 import { EditTagsModal } from "./EditTagsModal"
+import { v4 as uuidV4 } from "uuid"
 
 function App() {
   const [editTagModalIsOpen, setEditTagModalIsOpen] = useState(false)
@@ -27,12 +27,16 @@ function App() {
           <SideBar />
           <Routes>
             <Route path="/" element={<IndexPage />} />
-            <Route path="/new" element={<NewNote />} />
+            {/* <Route path="/new" element={<NewNote />} /> */}
+            <Route
+              path="/new"
+              element={<Navigate to={`/${uuidV4()}/edit`} />}
+            />
             <Route path="/:id" element={<NoteLayout />}>
               <Route index element={<Note />} />
               <Route path="edit" element={<EditNote />} />
             </Route>
-            <Route path="*" element={<Navigate to="/" replace={true} />} />
+            {/* <Route path="*" element={<Navigate to="/" replace={true} />} /> */}
           </Routes>
         </div>
         <EditTagsModal
