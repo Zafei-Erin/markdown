@@ -1,11 +1,11 @@
 import React, { createContext, useEffect, useMemo, useState } from "react"
 import { Column, Note, NoteData, RawNote, Tag } from "./Type"
 import { v4 as uuidV4 } from "uuid"
-import { Socket } from "socket.io-client"
+import { io, Socket } from "socket.io-client"
 
 type ContextProviderProps = {
-  socket: Socket
   children: React.ReactNode
+  socket: Socket
 }
 
 type value = {
@@ -24,18 +24,14 @@ type value = {
 
 export const appContext = createContext<value | null>(null)
 
-export const ContextProvider = ({
-  children,
-  ...props
-}: ContextProviderProps) => {
-  const { socket } = props
-
+export const ContextProvider = ({ socket, children }: ContextProviderProps) => {
   const [notes, setNotes] = useState<RawNote[]>([])
   const [tags, setTags] = useState<Tag[]>([])
   const [column, setColumn] = useState<Column>({
     _id: "1",
     noteIds: [],
   })
+  console.log("C")
 
   function load() {
     if (socket == null) return

@@ -50,6 +50,20 @@ export function NoteForm({
   const [selectedTags, setSelectedTags] = useState<Tag[]>(tags)
   const navigate = useNavigate()
   const titleRef = useRef<HTMLInputElement>(null)
+  const copy = async (e: FormEvent) => {
+    if (titleRef.current!.value === "") {
+      alert("please input a title")
+      return
+    }
+    e.preventDefault()
+    await navigator.clipboard.writeText(window.location.href)
+    alert("Link copied, share with friends!")
+    onSubmit({
+      title: titleRef.current!.value,
+      markdown: JSON.stringify(quill?.getContents()) || "",
+      tags: selectedTags,
+    })
+  }
 
   const markdownRef = useCallback((wrapper: HTMLDivElement) => {
     if (wrapper == null) return
@@ -71,13 +85,30 @@ export function NoteForm({
   // load the right document
   useEffect(() => {
     if (quill == null || socket == null) return
+    console.log("getting note from form")
+
     socket.emit("get-note", _id)
 
-    socket.on("load-note", (note) => {
+    socket.once("load-note", (note) => {
       quill.setContents(JSON.parse(note))
       quill.enable()
     })
   }, [quill, socket, _id])
+
+  // receive changes from server
+  useEffect(() => {
+    if (quill == null || socket == null) return
+
+    const handler = (delta: Delta) => {
+      // @ts-ignore
+      quill.updateContents(delta)
+      console.log("receive-changes")
+    }
+    socket.on("receive-changes", handler)
+    return () => {
+      socket.off("receive-changes", handler)
+    }
+  }, [quill, socket])
 
   // track user's changes, send them to server
   useEffect(() => {
@@ -86,6 +117,7 @@ export function NoteForm({
     const handler = (delta: Delta, oldDelta: Delta, source: string) => {
       if (source !== "user") return
       socket.emit("send-changes", delta)
+      console.log("send-changes")
     }
     // @ts-ignore
     quill.on("text-change", handler)
@@ -96,21 +128,16 @@ export function NoteForm({
     }
   }, [quill, socket])
 
-  // receive changes from server
-  useEffect(() => {
-    if (quill == null || socket == null) return
+  // autosave doc to db
+  // useEffect(() => {
+  //   if (quill == null || socket == null) return
 
-    const handler = (delta: Delta) => {
-      // @ts-ignore
-      quill.updateContents(delta)
-    }
-
-    socket.on("receive-changes", handler)
-
-    return () => {
-      socket.off("receive-changes", handler)
-    }
-  }, [quill, socket])
+  //   onSubmit({
+  //     title: titleRef.current!.value,
+  //     markdown: JSON.stringify(quill?.getContents()) || "",
+  //     tags: selectedTags,
+  //   })
+  // }, [socket, quill])
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -127,6 +154,12 @@ export function NoteForm({
   return (
     <Form onSubmit={handleSubmit}>
       <Stack gap={4}>
+        <button
+          className="my-1 w-[160px] border-2 rounded-full px-2 border-[#3864A5] text-sm font-semibold hover:text-white hover:bg-[#3864A5]"
+          onClick={copy}
+        >
+          write with friends
+        </button>
         <Row>
           <Col>
             <Form.Group controlId="title">

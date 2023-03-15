@@ -27,10 +27,12 @@ export function Note() {
   }, [])
 
   const { id } = useParams()
+
   useEffect(() => {
     if (quill == null || socket == null) return
 
     socket.emit("get-note", id)
+
     socket.on("load-note", (note) => {
       quill.setContents(JSON.parse(note))
     })

@@ -8,8 +8,10 @@ import { NewNote } from "./NewNote"
 import { NoteList } from "./note-list"
 import { RawNote, Tag } from "./Type"
 
-export default function Header() {
-  const { notes, tags, column, onSaveColumn } = useContext(appContext)!
+export default function Sidebar() {
+  console.log("sidebar")
+
+  const { notes, tags, column } = useContext(appContext)!
   const [selectedTags, setSelectedTags] = useState<Tag[]>([])
   const [title, setTitle] = useState("")
   const notesOrder = column.noteIds
@@ -41,6 +43,18 @@ export default function Header() {
     })
   }, [title, selectedTags, notesWithTags])
 
+  const tagStyles = (b: any, s: any) => ({
+    ...b,
+    width: "90%",
+    height: "22px",
+    borderWidth: "2px",
+    borderColor: "#d1d5db",
+    fontSize: "14px",
+    color: "#111827",
+    paddingLeft: "6px",
+    overflow: "hidden",
+  })
+
   return (
     <div className="flex-none max-w-[260px] min-w-[200px] w-[26%] shadow-[10px_0_25px_-24px_rgb(0,0,0,0.3)] mr-10">
       <Form>
@@ -57,17 +71,7 @@ export default function Header() {
           <Form.Group controlId="tags">
             <ReactSelect
               styles={{
-                control: (b, s) => ({
-                  ...b,
-                  width: "90%",
-                  height: "22px",
-                  borderWidth: "2px",
-                  borderColor: "#d1d5db",
-                  fontSize: "14px",
-                  color: "#111827",
-                  paddingLeft: "6px",
-                  overflow: "hidden",
-                }),
+                control: tagStyles,
               }}
               value={selectedTags.map((tag) => {
                 return { label: tag.label, value: tag._id }

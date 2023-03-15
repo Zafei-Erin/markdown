@@ -15,16 +15,14 @@ import IndexPage from "./IndexPage"
 import { EditTagsModal } from "./EditTagsModal"
 
 function App() {
-  const [socket, setSocket] = useState<Socket>(io("http://localhost:3001"))
   const [editTagModalIsOpen, setEditTagModalIsOpen] = useState(false)
-
+  const [socket, setSocket] = useState<Socket>(io("http://localhost:3001"))
   return (
-    <ContextProvider socket={socket}>
-      <div className="my-4 mx-[2%] h-screen pb-6">
-        <div className="h-[10%]">
-          <Header setEditTagModalIsOpen={setEditTagModalIsOpen} />
-        </div>
-
+    <div className="my-4 mx-[2%] h-screen pb-6">
+      <div className="h-[10%]">
+        <Header setEditTagModalIsOpen={setEditTagModalIsOpen} />
+      </div>
+      <ContextProvider socket={socket}>
         <div className="flex min-h-screen">
           <SideBar />
           <Routes>
@@ -41,8 +39,8 @@ function App() {
           show={editTagModalIsOpen}
           handleClose={() => setEditTagModalIsOpen(false)}
         />
-      </div>
-    </ContextProvider>
+      </ContextProvider>
+    </div>
   )
 }
 
