@@ -7,7 +7,7 @@ import { SimplifiedNote } from "./Type"
 export function NoteCard({ _id, title, tags }: SimplifiedNote) {
   return (
     <Link
-      to={`/${_id}`}
+      to={`/document/${_id}`}
       className="text-reset text-decoration-none w-full h-full flex align-items-center"
     >
       <div className=" w-full pl-3">

@@ -27,16 +27,15 @@ function App() {
           <SideBar />
           <Routes>
             <Route path="/" element={<IndexPage />} />
-            {/* <Route path="/new" element={<NewNote />} /> */}
             <Route
               path="/new"
-              element={<Navigate to={`/${uuidV4()}/edit`} />}
+              element={<Navigate to={`/document/${uuidV4()}/edit`} />}
             />
-            <Route path="/:id" element={<NoteLayout />}>
+            <Route path="/document/:id" element={<NoteLayout />}>
               <Route index element={<Note />} />
               <Route path="edit" element={<EditNote />} />
             </Route>
-            {/* <Route path="*" element={<Navigate to="/" replace={true} />} /> */}
+            <Route path="*" element={<Navigate to="/" replace={true} />} />
           </Routes>
         </div>
         <EditTagsModal
