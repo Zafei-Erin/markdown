@@ -33,6 +33,8 @@ const TOOLBAR_OPTIONS = [
   ["clean"],
 ]
 
+const SAVE_INTERVAL_MS = 20000
+
 export function NoteForm({
   onSubmit,
   _id,
@@ -51,11 +53,11 @@ export function NoteForm({
   const navigate = useNavigate()
   const titleRef = useRef<HTMLInputElement>(null)
   const copy = async (e: FormEvent) => {
+    e.preventDefault()
     if (titleRef.current!.value === "") {
       alert("please input a title")
       return
     }
-    e.preventDefault()
     await navigator.clipboard.writeText(window.location.href)
     alert("Link copied, share with friends!")
     onSubmit({
@@ -129,15 +131,21 @@ export function NoteForm({
   }, [quill, socket])
 
   // autosave doc to db
-  // useEffect(() => {
-  //   if (quill == null || socket == null) return
+  useEffect(() => {
+    if (quill == null || socket == null) return
 
-  //   onSubmit({
-  //     title: titleRef.current!.value,
-  //     markdown: JSON.stringify(quill?.getContents()) || "",
-  //     tags: selectedTags,
-  //   })
-  // }, [socket, quill])
+    const interval = setInterval(() => {
+      onSubmit({
+        title: titleRef.current!.value,
+        markdown: JSON.stringify(quill?.getContents()) || "",
+        tags: selectedTags,
+      })
+    }, SAVE_INTERVAL_MS)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [socket, quill])
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()

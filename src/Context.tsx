@@ -74,8 +74,6 @@ export const ContextProvider = ({ socket, children }: ContextProviderProps) => {
     const temp = column.noteIds
     const newOrder = temp.filter((id) => id !== _id)
     newOrder.unshift(_id)
-    console.log("id" + _id)
-    console.log("new Order" + newOrder)
 
     const newColumn = {
       _id: "1",
